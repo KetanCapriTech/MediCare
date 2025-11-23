@@ -21,7 +21,7 @@ namespace MediCare.CustomAttributes
             //get token from header
             var header = context.HttpContext.Request.Headers["Authorization"].FirstOrDefault();
 
-            if (header != null || !header.StartsWith("Bearer"))
+            if (header == null || !header.StartsWith("Bearer"))
             {
                 context.Result = new UnauthorizedResult();
                 return;

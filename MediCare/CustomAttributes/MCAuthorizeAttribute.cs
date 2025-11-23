@@ -5,7 +5,7 @@ namespace MediCare.CustomAttributes
 {
     public class MCAuthorizeAttribute : TypeFilterAttribute
     {
-        public MCAuthorizeAttribute() : base(typeof(MCAuthorizeAttribute)) 
+        public MCAuthorizeAttribute() : base(typeof(MCAuthorizeFilter)) 
         {
             
         }
