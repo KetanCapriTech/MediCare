@@ -1,5 +1,5 @@
 ﻿using MediCare.Dto;
-using MediCare.Models;
+using MediCareApi.Models;
 using Microsoft.IdentityModel.Tokens;
 
 namespace MediCare.Services.Interfaces

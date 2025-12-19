@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediCareApi", "MediCare\Med
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediCareDto", "MediCare.Dto\MediCareDto.csproj", "{B5F55CB5-D268-40F9-BCAD-4C7C13107CE5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MediCareUtilities", "MediCareUtilities\MediCareUtilities.csproj", "{982F1260-1A23-4891-95AD-72CFA302FD31}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{B5F55CB5-D268-40F9-BCAD-4C7C13107CE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B5F55CB5-D268-40F9-BCAD-4C7C13107CE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B5F55CB5-D268-40F9-BCAD-4C7C13107CE5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{982F1260-1A23-4891-95AD-72CFA302FD31}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{982F1260-1A23-4891-95AD-72CFA302FD31}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{982F1260-1A23-4891-95AD-72CFA302FD31}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{982F1260-1A23-4891-95AD-72CFA302FD31}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
