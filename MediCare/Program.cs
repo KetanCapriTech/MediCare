@@ -1,10 +1,16 @@
 using MediCare.CustomAttributes;
 using MediCare.Services.Implementations;
 using MediCare.Services.Interfaces;
+using MediCareApi.Data;
+using MediCareApi.Repositories.Implementations;
+using MediCareApi.Repositories.Interfaces;
+using MediCareApi.Services.Implementations;
+using MediCareApi.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Text;
-using Microsoft.OpenApi.Models; 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
@@ -19,6 +25,14 @@ var key = Encoding.UTF8.GetBytes(jwtSettings["Key"] ?? throw new ArgumentNullExc
 var jwtIssuer = jwtSettings["Issuer"];
 var jwtAudience = jwtSettings["Audience"];
 
+// DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("MediCareDb"))
+);
+
+// Register Repositories & Services
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddEndpointsApiExplorer();
 
