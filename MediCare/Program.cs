@@ -17,7 +17,6 @@ builder.Services.AddControllers();
 
 builder.Services.AddSingleton<IJwtHelper, JwtHelper>();
 
-builder.Services.AddScoped<MCAuthorizeFilter>();
 
 // JWT Configuration
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -33,6 +32,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Register Repositories & Services
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 builder.Services.AddEndpointsApiExplorer();
 

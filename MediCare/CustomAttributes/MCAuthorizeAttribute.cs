@@ -5,9 +5,9 @@ namespace MediCare.CustomAttributes
 {
     public class MCAuthorizeAttribute : TypeFilterAttribute
     {
-        public MCAuthorizeAttribute() : base(typeof(MCAuthorizeFilter)) 
+        public MCAuthorizeAttribute(int roleId = 0) : base(typeof(MCAuthorizeFilter)) 
         {
-            
+            Arguments = new object[] { roleId };
         }
     }
 }

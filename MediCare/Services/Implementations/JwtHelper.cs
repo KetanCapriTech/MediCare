@@ -39,6 +39,7 @@ namespace MediCare.Services.Implementations
                 new Claim(JwtRegisteredClaimNames.Email , user.Email),
                 new Claim(JwtRegisteredClaimNames.Name, user.FirstName + " " + user.LastName),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                new Claim(ClaimTypes.Role, user.RoleId.ToString()),
             };
 
             // after claims adding get the issure , audience , subject, expire, signcredentilas
@@ -94,7 +95,7 @@ namespace MediCare.Services.Implementations
                 userModel = new UserDto
                 {
                     Id = userId != null ? Convert.ToInt32(userId) : 0,
-                    Name = name ?? string.Empty,
+                    Name = name ?? string.Empty
                 };
             }
             return userModel;

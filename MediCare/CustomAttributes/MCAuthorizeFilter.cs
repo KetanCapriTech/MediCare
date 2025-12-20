@@ -3,52 +3,64 @@ using MediCare.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.IdentityModel.Tokens;
-using System.Security.Permissions;
 
 namespace MediCare.CustomAttributes
 {
     public class MCAuthorizeFilter : IAuthorizationFilter
     {
         private readonly IJwtHelper _jwtHelper;
+        private readonly int _requiredRoleId;
 
-        public MCAuthorizeFilter(IJwtHelper jwtHelper)
+        public MCAuthorizeFilter(IJwtHelper jwtHelper, int requiredRoleId)
         {
             _jwtHelper = jwtHelper;
+            _requiredRoleId = requiredRoleId;
         }
 
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            //get token from header
+            // Get token from header
             var header = context.HttpContext.Request.Headers["Authorization"].FirstOrDefault();
 
-            if (header == null || !header.StartsWith("Bearer"))
+            if (header == null || !header.StartsWith("Bearer "))
             {
                 context.Result = new UnauthorizedResult();
                 return;
             }
 
             var token = header.Substring("Bearer ".Length);
-            if (string.IsNullOrEmpty(token)) {
-                context.Result = new UnauthorizedResult();
-                return;
-            }
-
-            TokenClaimDto tokenClaimDto = new TokenClaimDto();
 
             try
             {
+                // Validate Token Integrity
                 SecurityToken? validatedToken;
-
                 bool isValid = _jwtHelper.ValidateToken(token, out validatedToken);
+
                 if (!isValid || validatedToken == null)
                 {
                     context.Result = new UnauthorizedResult();
                     return;
                 }
 
-                tokenClaimDto = _jwtHelper.GetRolIdFromToken(token);
+                // Role Authorization Logic
+                // If _requiredRoleId is 0, we only care if the token is valid (Existing behavior)
+                if (_requiredRoleId != 0)
+                {
+                    var tokenClaimDto = _jwtHelper.GetRolIdFromToken(token);
+
+                    // If the user's RoleId from the token doesn't match the required one, Block access
+                    if (tokenClaimDto.RoleId != _requiredRoleId)
+                    {
+                        context.Result = new ObjectResult(new { message = "Forbidden: Insufficient Permissions" })
+                        {
+                            StatusCode = 403
+                        };
+                        return;
+                    }
+                }
             }
-            catch (Exception ex) {
+            catch (Exception)
+            {
                 context.Result = new UnauthorizedResult();
                 return;
             }

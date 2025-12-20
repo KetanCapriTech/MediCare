@@ -1,8 +1,10 @@
-﻿using MediCare.Dto.Auth;
+﻿using MediCare.Dto;
+using MediCare.Dto.Auth;
 using MediCareApi.Data;
 using MediCareApi.Models;
 using MediCareApi.Repositories.Interfaces;
 using MediCareDto.Auth;
+using MediCareUtilities;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +22,11 @@ namespace MediCareApi.Repositories.Implementations
         {
             try
             {
+                var  isExistingUser = _context.Users.Any(u => u.Email == user.Email);
+                if (isExistingUser) {
+                    return -1; 
+                }
+
                 await _context.Users.AddAsync(user);
                 var result = await _context.SaveChangesAsync();
 
@@ -30,7 +37,7 @@ namespace MediCareApi.Repositories.Implementations
             }
         }
 
-        public async Task<User> GetUserByEmail(string email)
+        public async Task<User> GetUserByEmailAsync(string email)
         {
             try
             {
@@ -43,6 +50,42 @@ namespace MediCareApi.Repositories.Implementations
             catch (Exception ex) {
                 return null;
             }
+        }
+
+        public async Task<User> GetUserByIDAsync(long userId)
+        {
+            try
+            {
+                var user = await _context.Users.Where(s => s.Id == userId).FirstOrDefaultAsync();
+                if (user == null)
+                {
+                    return null;
+                }
+                return user;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
+        }
+
+        // only for admin
+        public async Task<User> ApproveUserAsync(string email)
+        {
+            var user = await _context.Users.Where(s => s.Email == email).FirstOrDefaultAsync();
+
+            if (user == null) {
+                return null;
+            }
+
+            user.UpdatedOn = DateTime.UtcNow;
+            user.UpdatedBy = (int)EnumRole.Admin;
+            user.IsActive = true;
+
+           await _context.SaveChangesAsync();
+
+            return user;
+
         }
     }
 }
