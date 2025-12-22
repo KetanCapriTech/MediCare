@@ -79,7 +79,7 @@ namespace MediCareApi.Services.Implementations
 
 
         // templates
-        public static string OtpTemplate(string otp)
+        private static string OtpTemplate(string otp)
         {
             return $@"
         <h2>Your OTP Code</h2>
@@ -88,7 +88,7 @@ namespace MediCareApi.Services.Implementations
         <p>This code expires in 5 minutes.</p>";
         }
 
-        public static string ResetPasswordTemplate(string link)
+        private static string ResetPasswordTemplate(string link)
         {
             return $@"
         <h2>Reset Password</h2>
@@ -105,7 +105,7 @@ namespace MediCareApi.Services.Implementations
         <a href='{link}'>Reset Password</a>";
         }
 
-        public static string RegisterTemplate(string link)
+        private static string RegisterTemplate(string link)
         {
             return $@"
         <h2>Welcome!</h2>
@@ -113,7 +113,7 @@ namespace MediCareApi.Services.Implementations
         <a href='{link}'>Register Now</a>";
         }
 
-        public static string InviteTemplate(string link)
+        private static string InviteTemplate(string link)
         {
             return $@"
         <h2>You are Invited!</h2>
@@ -121,7 +121,7 @@ namespace MediCareApi.Services.Implementations
         <a href='{link}'>Accept Invitation</a>";
         }
 
-        public static string AdminApprovalTemplate(string userEmail, string role, string approveLink)
+        private static string AdminApprovalTemplate(string userEmail, string role, string approveLink)
         {
             return $@"
             <h2>Approval Required</h2>

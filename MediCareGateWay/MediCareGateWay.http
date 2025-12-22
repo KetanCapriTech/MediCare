@@ -1,0 +1,6 @@
+@MediCareGateWay_HostAddress = http://localhost:5199
+
+GET {{MediCareGateWay_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
