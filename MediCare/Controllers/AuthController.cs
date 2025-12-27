@@ -47,7 +47,6 @@ namespace MediCare.Controllers
 
         }
 
-        //[Authorize(Roles = "Admin")] // Only Admin can see/use this in Swagger
         [MCAuthorize(1)]
         [HttpPatch("admin/approve-user/{Email}")]
         public async Task<IActionResult> ApproveUser(string email)
