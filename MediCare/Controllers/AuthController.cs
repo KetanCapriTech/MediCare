@@ -36,14 +36,26 @@ namespace MediCare.Controllers
 
             if(result == -1)
             {
-                return BadRequest($"User with email : {request.Email} is already exist");
+                return Conflict(new
+                {
+                    success = false,
+                    message = $"User with email {request.Email} already exists"
+                });
             }
             else if(result == -2)
             {
-                return Ok($"Wait for admin to approve the request");
+                return Accepted(new
+                {
+                    success = false,
+                    message = "Wait for admin approval"
+                });
             }
 
-            return Ok(result);
+            return Ok(new
+            {
+                success = true,
+                message = "User registered successfully"
+            });
 
         }
 

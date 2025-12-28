@@ -107,7 +107,7 @@ namespace MediCareApi.Services.Implementations
                 CreatedOn = DateTime.UtcNow,
                 IsActive = shouldBeActive,
                 Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
-                RoleId = request.RoleId,
+                RoleId = (short)request.RoleId,
             };
 
             if (request.RoleId == (int)EnumRole.Staff || request.RoleId == (int)EnumRole.Doctor)

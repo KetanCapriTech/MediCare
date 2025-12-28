@@ -16,8 +16,8 @@ builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
 
-    .AddJsonFile("ocelot.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"ocelot.{env}.json", optional: true, reloadOnChange: true);
+    .AddJsonFile("configuration.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"configuration.{env}.json", optional: true, reloadOnChange: true);
 
 // -------------------------------
 // Bind JWT Settings
