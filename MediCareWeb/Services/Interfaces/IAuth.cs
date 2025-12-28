@@ -6,5 +6,6 @@ namespace MediCareWeb.Services.Interfaces
     public interface IAuth
     {
         Task<AuthResponse> Login(LoginRequest model);
+        Task<AuthResponse?> Register(RegisterUserRequest model);
     }
 }

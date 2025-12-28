@@ -1,7 +1,13 @@
+using MediCareWeb.Services.Implementations;
+using MediCareWeb.Services.Interfaces;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+builder.Services.AddHttpClient<Auth>();
+builder.Services.AddScoped<IAuth, Auth>();
 
 var app = builder.Build();
 
