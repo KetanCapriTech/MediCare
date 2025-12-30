@@ -52,7 +52,7 @@ namespace MediCareApi.Repositories.Implementations
             }
         }
 
-        public async Task<User> GetUserByIDAsync(long userId)
+        public async Task<User> GetUserByIdAsync(long userId)
         {
             try
             {

@@ -23,9 +23,9 @@ namespace MediCareApi.Services.Implementations
             _emailService = emailService;
         }
 
-        public Task<User> ApproveUser(string email)
+        public async Task<User> ApproveUser(string email)
         {
-            var userUpdated = _userRepository.ApproveUserAsync(email);
+            var userUpdated = await _userRepository.ApproveUserAsync(email);
 
             if (userUpdated == null) {
 
@@ -36,9 +36,9 @@ namespace MediCareApi.Services.Implementations
 
         }
 
-        public Task<User> GetUserById(long userId)
+        public async Task<User> GetUserById(long userId)
         {
-            var user = _userRepository.GetUserByIDAsync(userId);
+            var user = await _userRepository.GetUserByIdAsync(userId);
             if(user == null)
             {
                 return null;

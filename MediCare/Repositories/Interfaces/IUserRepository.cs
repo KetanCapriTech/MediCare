@@ -9,7 +9,7 @@ namespace MediCareApi.Repositories.Interfaces
     {
         Task<long> CreateUserAsync(User user);
         Task<User> GetUserByEmailAsync(string request);
-        Task<User> GetUserByIDAsync(long userId);
+        Task<User> GetUserByIdAsync(long userId);
         Task<User> ApproveUserAsync(string email);
     }
 }

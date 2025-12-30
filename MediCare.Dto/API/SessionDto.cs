@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MediCare.Dto
+namespace MediCareDto.API
 {
-    public class UserDto
+    public class SessionDto
     {
-        public int Id { get; set; }
-        public string Name { get; set; } = string.Empty;
+        public long Id { get; set; }
+
         public string FirstName { get; set; } = null!;
 
         public string LastName { get; set; } = null!;
@@ -31,5 +31,6 @@ namespace MediCare.Dto
         public string? Address { get; set; }
 
         public bool IsActive { get; set; }
+        public string? UserToken { get; set; }
     }
 }
