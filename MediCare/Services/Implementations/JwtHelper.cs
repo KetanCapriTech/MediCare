@@ -95,7 +95,7 @@ namespace MediCare.Services.Implementations
                 userModel = new UserDto
                 {
                     Id = userId != null ? Convert.ToInt32(userId) : 0,
-                    Name = name ?? string.Empty
+                    FirstName = name ?? string.Empty
                 };
             }
             return userModel;

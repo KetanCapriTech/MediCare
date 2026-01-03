@@ -26,7 +26,7 @@ var jwtAudience = jwtSettings["Audience"];
 
 // DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("MediCareDb"))
+    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgresDB"))
 );
 
 // Register Repositories & Services

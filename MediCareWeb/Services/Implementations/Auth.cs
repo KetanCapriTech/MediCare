@@ -1,5 +1,6 @@
 ﻿using MediCare.Dto.Auth;
 using MediCareDto.Auth;
+using MediCareDto.Auth.Jwt;
 using MediCareWeb.Services.Interfaces;
 using System.Net;
 using System.Threading.Tasks;
@@ -12,13 +13,22 @@ namespace MediCareWeb.Services.Implementations
         private readonly IConfiguration _configuration;
         private readonly string _backendUrl;
 
-
         public Auth(HttpClient httpClient, IConfiguration configuration)
         {
             _httpClient = httpClient;
             _configuration = configuration;
             _backendUrl = _configuration["BackendUrl"] ?? throw new InvalidOperationException("BackendUrl not found in configuration.");
+        }
 
+        public async Task<bool> ForgotPassword(string email)
+        {
+            var response = await _httpClient.PostAsJsonAsync($"{_backendUrl}/api/v1/forgot-password", email);
+
+            if (!response.IsSuccessStatusCode) { 
+                
+                return false;
+            }
+            return true;    
         }
 
         public async Task<AuthResponse?> Login(LoginRequest model)
@@ -82,9 +92,31 @@ namespace MediCareWeb.Services.Implementations
             {
                 IsSuccess = true,
                 Message = "Registration successful",
-                UserId = data!.UserId
+                UserId = data!.UserId,
+                Email = data.Email
             };
         }
 
+        public async Task<bool> ResetPassword(RestPasswordDto model)
+        {
+           var result = await _httpClient.PostAsJsonAsync($"{_backendUrl}/api/v1/reset-password", model);
+           if(!result.IsSuccessStatusCode)
+           {
+              return false;
+           }
+           return true;
+        }
+
+        public async Task<bool> ValidateOtp(OtpDto model)
+        {
+            var response = await _httpClient.PostAsJsonAsync($"{_backendUrl}/api/v1/validate-otp", model);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }

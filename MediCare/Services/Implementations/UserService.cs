@@ -5,6 +5,7 @@ using MediCareApi.Models;
 using MediCareApi.Repositories.Interfaces;
 using MediCareApi.Services.Interfaces;
 using MediCareDto.Auth;
+using MediCareDto.Auth.Jwt;
 using MediCareUtilities;
 using System.Security.Claims;
 
@@ -23,9 +24,9 @@ namespace MediCareApi.Services.Implementations
             _emailService = emailService;
         }
 
-        public Task<User> ApproveUser(string email)
+        public async Task<User> ApproveUser(string email)
         {
-            var userUpdated = _userRepository.ApproveUserAsync(email);
+            var userUpdated = await _userRepository.ApproveUserAsync(email);
 
             if (userUpdated == null) {
 
@@ -36,9 +37,32 @@ namespace MediCareApi.Services.Implementations
 
         }
 
-        public Task<User> GetUserById(long userId)
+        public async Task<bool> ForgotPassword(string email)
         {
-            var user = _userRepository.GetUserByIDAsync(userId);
+           var user = await _userRepository.GetUserByEmailAsync(email);
+
+            if (user == null) { 
+                return false;
+            }
+            var otpCode = new Random().Next(100000, 999999);
+            user.OtpExpireTime = DateTime.UtcNow.AddMinutes(15);
+            user.Otp = otpCode;
+            
+            var isUpdated = await _userRepository.UpdateUserAsync(user);
+
+            if(isUpdated == false)
+            {
+                return false; 
+            }
+
+            _emailService.SendOtp(email, otpCode.ToString());
+
+            return true;
+        }
+
+        public async Task<User> GetUserById(long userId)
+        {
+            var user = await _userRepository.GetUserByIdAsync(userId);
             if(user == null)
             {
                 return null;
@@ -48,55 +72,61 @@ namespace MediCareApi.Services.Implementations
 
         public async Task<AuthResponse> Login(LoginRequest request)
         {
-            try
+            var user = await _userRepository.GetUserByEmailAsync(request.Email);
+
+            if (user == null)
             {
-                var result = await _userRepository.GetUserByEmailAsync(request.Email);
-
-                if (result == null)
-                {
-                    return new AuthResponse
-                    {
-                        Message = "User not found",
-                        IsSuccess = false,
-                    };
-                }
-
-                if (!BCrypt.Net.BCrypt.Verify(request.Password, result.Password))
-                {
-                    return new AuthResponse { Message = "Invalid password entered" };
-                }
-
                 return new AuthResponse
                 {
-
-                    Message = "Login success",
-                    Token = _jwtHelper.GenrateJwtToken(result),
-                    IsSuccess = true,
-                    Email = result.Email,
-                    UserId = result.Id
-                };
-            }
-            catch (Exception ex)
-            {
-
-                return new AuthResponse
-                {
-                    Message = ex.Message,
+                    Message = "User not found",
                     IsSuccess = false
                 };
             }
+
+            try
+            {
+                bool isValid = BCrypt.Net.BCrypt.Verify(
+                    request.Password,
+                    user.Password
+                );
+
+                if (!isValid)
+                {
+                    return new AuthResponse
+                    {
+                        Message = "Invalid password entered",
+                        IsSuccess = false
+                    };
+                }
+            }
+            catch (BCrypt.Net.SaltParseException)
+            {
+                // Handles old/plain-text or corrupted passwords safely
+                return new AuthResponse
+                {
+                    Message = "Password is invalid. Please reset your password.",
+                    IsSuccess = false
+                };
+            }
+
+            return new AuthResponse
+            {
+                Message = "Login success",
+                Token = _jwtHelper.GenrateJwtToken(user),
+                IsSuccess = true,
+                Email = user.Email,
+                UserId = user.Id
+            };
         }
 
         public async Task<long> RegisterUser(RegisterUserRequest request)
         {
-            var forbidenRoles = new[] { (int)EnumRole.Admin, (int)EnumRole.Manager };
-            string role = "";
-            if (forbidenRoles.Contains(request.RoleId))
-            {
-                throw new UnauthorizedAccessException("This role requires administrative invitation.");
-            }
+            // Determine if this user can be active immediately
+            // In your Medicare app, NO ONE starts active. 
+            // Patients need OTP. Others need Admin Approval.
+            bool isPatient = (request.RoleId == (int)EnumRole.Patient);
 
-            bool shouldBeActive = (request.RoleId == (int)EnumRole.Patient);
+            var otpCode = new Random().Next(100000, 999999);
 
             User user = new User()
             {
@@ -105,32 +135,81 @@ namespace MediCareApi.Services.Implementations
                 Email = request.Email,
                 Address = request.Address,
                 CreatedOn = DateTime.UtcNow,
-                IsActive = shouldBeActive,
+                IsActive = false, 
                 Password = BCrypt.Net.BCrypt.HashPassword(request.Password),
                 RoleId = (short)request.RoleId,
+                Otp = otpCode,
+                OtpExpireTime = DateTime.UtcNow.AddMinutes(15)
             };
 
-            if (request.RoleId == (int)EnumRole.Staff || request.RoleId == (int)EnumRole.Doctor)
-            {
-                role = request.RoleId == 3 ? EnumRole.Doctor.ToString() : EnumRole.Staff.ToString();
-            }
             var result = await _userRepository.CreateUserAsync(user);
 
-            // Notify Admin if a Doctor/Staff registered
-            if (!shouldBeActive)
+            if(result == -1)
             {
-                // _mailService.NotifyAdmin($"New {request.RoleId} registration pending approval: {request.Email}");
+                return -1;
+            }
+
+            // Handle Notifications based on Role
+            if (isPatient)
+            {
+                // Flow A: Send OTP to Patient
+                _emailService.SendOtp(user.Email, otpCode.ToString());
+            }
+            else
+            {
+                // Flow B: Admin, Manager, Doctor, Staff
+                // All these roles need someone to "Approve" them
+                string roleName = Enum.GetName(typeof(EnumRole), request.RoleId) ?? "User";
                 _emailService.SendAdminApprovalRequest(
                     adminEmail: "ketanfundedev77@gmail.com",
                     userEmail: request.Email,
-                    role: role
+                    role: roleName
                 );
-
-                return -2;
             }
 
             return result;
-
         }
+
+        public async Task<bool> ResetPassword(RestPasswordDto model)
+        {
+            var user = await _userRepository.GetUserByEmailAsync(model.Email!);
+            if (user == null) return false;
+
+            user.Password = BCrypt.Net.BCrypt.HashPassword(model.ConfirmPassword);
+            user.CreatedBy = user.Id;
+            user.UpdatedOn = DateTime.UtcNow;
+
+            return await _userRepository.UpdateUserAsync(user);
+        }
+
+        public async Task<bool> ValidateOtp(string email, string otp)
+        {
+            var user = await _userRepository.GetUserByEmailAsync(email);
+
+            if (user == null)
+            {
+                return false;
+            }
+
+            // Check: Does OTP match AND is it still within the 15-minute window?
+            if (user.Otp.ToString() == otp && user.OtpExpireTime > DateTime.UtcNow)
+            {
+                if (user.IsActive == false)
+                {
+                    user.IsActive = true;
+                }
+
+                // Save the change to the database
+                var result = await _userRepository.UpdateUserAsync(user);
+                if(result == false)
+                {
+                    return false;
+                }
+                return true;
+            }
+
+            return false;
+        }
+
     }
 }

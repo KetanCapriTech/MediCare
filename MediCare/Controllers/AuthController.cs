@@ -5,8 +5,10 @@ using MediCare.Services.Interfaces;
 using MediCareApi.Models;
 using MediCareApi.Services.Interfaces;
 using MediCareDto.Auth;
+using MediCareDto.Auth.Jwt;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace MediCare.Controllers
 {
@@ -25,16 +27,16 @@ namespace MediCare.Controllers
         }
 
         [HttpPost("register-user")]
-        public async Task<IActionResult> Register([FromBody] RegisterUserRequest request) { 
-            
-            if(request == null)
+        public async Task<IActionResult> Register([FromBody] RegisterUserRequest request) {
+
+            if (request == null)
             {
                 return BadRequest(ModelState);
             }
 
             var result = await _userService.RegisterUser(request);
 
-            if(result == -1)
+            if (result == -1)
             {
                 return Conflict(new
                 {
@@ -42,7 +44,7 @@ namespace MediCare.Controllers
                     message = $"User with email {request.Email} already exists"
                 });
             }
-            else if(result == -2)
+            else if (result == -2)
             {
                 return Accepted(new
                 {
@@ -54,7 +56,8 @@ namespace MediCare.Controllers
             return Ok(new
             {
                 success = true,
-                message = "User registered successfully"
+                message = "User registered successfully",
+                Email = request.Email
             });
 
         }
@@ -73,12 +76,56 @@ namespace MediCare.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult Login([FromBody] LoginRequest loginRequest)
+        public async Task<IActionResult> Login([FromBody] LoginRequest loginRequest)
         {
+            var user = await _userService.Login(loginRequest);
 
-            var user = _userService.Login(loginRequest);
+            if (user == null || !user.IsSuccess)
+            {
+                return BadRequest("Invalid credentials");
+            }
+            return Ok(user);
+        }
 
-            return Ok(user.Result);
+        [HttpPost("validate-otp")]
+        public async Task<IActionResult> ValidateOtp([FromBody] OtpDto model)
+        {
+            if (model == null)
+            {
+                return BadRequest("Invalid OTP request");
+            }
+            var result = await _userService.ValidateOtp(model.email, model.otp);
+
+            if (result == false)
+            {
+                return BadRequest(result);
+            }
+            return Ok(result);
+        }
+
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] string email) {
+
+            var result = await _userService.ForgotPassword(email);
+
+            if (result == false)
+            {
+                return BadRequest("Email does not exist");
+            }
+
+            return Ok($"Otp sent on registered : {email}");
+        }
+
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPasswordDto([FromBody] RestPasswordDto model)
+        {
+            var result = await _userService.ResetPassword(model);
+
+            if(result == false)
+            {
+               return BadRequest("Failed to Update Password");
+            }
+            return Ok(result);
         }
     }
 }

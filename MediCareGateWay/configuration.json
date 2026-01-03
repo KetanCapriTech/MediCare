@@ -23,6 +23,54 @@
           "Port": 5153
         }
       ]
+    },
+    {
+      "UpstreamPathTemplate": "/api/v1/get-user-by-id",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamPathTemplate": "/api/user/get-user-by-id",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5153
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/api/v1/validate-otp",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamPathTemplate": "/api/auth/validate-otp",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5153
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/api/v1/forgot-password",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamPathTemplate": "/api/auth/forgot-password",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5153
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/api/v1/reset-password",
+      "UpstreamHttpMethod": [ "POST" ],
+      "DownstreamPathTemplate": "/api/auth/reset-password",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5153
+        }
+      ]
     }
   ],
   "GlobalConfiguration": {
