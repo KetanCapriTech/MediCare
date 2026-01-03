@@ -24,5 +24,6 @@ namespace MediCareWeb.Services.Implementations
 
             return await response.Content.ReadFromJsonAsync<UserDto>();
         }
+
     }
 }

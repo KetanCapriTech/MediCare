@@ -87,5 +87,16 @@ namespace MediCareApi.Repositories.Implementations
             return user;
 
         }
+
+        public async Task<bool> UpdateUserAsync(User user)
+        {
+            var result = await _context.Users.FirstOrDefaultAsync(s => s.Id == user.Id);
+            if(result == null)
+            {
+                return false;
+            }
+            await _context.SaveChangesAsync();
+            return true;
+        }
     }
 }

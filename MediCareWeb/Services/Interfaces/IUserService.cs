@@ -1,5 +1,6 @@
 ﻿using MediCare.Dto;
 using MediCareApi.Models;
+using MediCareDto.Auth;
 
 namespace MediCareWeb.Services.Interfaces
 {

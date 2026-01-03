@@ -13,9 +13,13 @@
     z-index: 99;
 }
 
+#spinner {
+    z-index: 99999;
+}
+
 
 /*** Spinner ***/
-#spinner {
+/*#spinner {
     opacity: 0;
     visibility: hidden;
     transition: opacity .5s ease-out, visibility 0s linear .5s;
@@ -27,7 +31,7 @@
     visibility: visible;
     opacity: 1;
 }
-
+*/
 
 /*** Button ***/
 .btn {

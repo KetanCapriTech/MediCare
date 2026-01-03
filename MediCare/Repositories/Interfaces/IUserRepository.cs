@@ -11,5 +11,6 @@ namespace MediCareApi.Repositories.Interfaces
         Task<User> GetUserByEmailAsync(string request);
         Task<User> GetUserByIdAsync(long userId);
         Task<User> ApproveUserAsync(string email);
+        Task<bool>UpdateUserAsync(User user);
     }
 }

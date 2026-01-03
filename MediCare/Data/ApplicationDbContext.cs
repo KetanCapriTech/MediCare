@@ -7,6 +7,10 @@ namespace MediCareApi.Data;
 
 public partial class ApplicationDbContext : DbContext
 {
+    public ApplicationDbContext()
+    {
+    }
+
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : base(options)
     {
@@ -15,6 +19,9 @@ public partial class ApplicationDbContext : DbContext
     public virtual DbSet<Role> Roles { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        => optionsBuilder.UseNpgsql("Name=PostgresDB");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -49,6 +56,8 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.FirstName).HasColumnName("first_name");
             entity.Property(e => e.IsActive).HasColumnName("is_active");
             entity.Property(e => e.LastName).HasColumnName("last_name");
+            entity.Property(e => e.Otp).HasColumnName("otp");
+            entity.Property(e => e.OtpExpireTime).HasColumnName("otp_expire_time");
             entity.Property(e => e.Password).HasColumnName("password");
             entity.Property(e => e.RoleId).HasColumnName("role_id");
             entity.Property(e => e.UpdatedBy).HasColumnName("updated_by");

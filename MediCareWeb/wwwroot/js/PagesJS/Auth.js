@@ -1,22 +1,21 @@
 function validateLoginForm() {
 
-    let email = $("#email").val().trim();
-    let password = $("#password").val().trim();
+    let email = $("#Email").val().trim();
+    let password = $("#Password").val().trim();
     if (email === "") {
         alert("Email is required");
-        $("#email").focus();
+        $("#Email").focus();
         return false;
     }
 
     if (password === "") {
         alert("Password is required");
-        $("#password").focus();
+        $("#Password").focus();
         return false;
     }
 
     return true;
 }
-
 function validateRegisterForm() {
     let firstName = $("#mdFirstName").val().trim();
     let lastName = $("#mdLastName").val().trim();
@@ -70,7 +69,6 @@ function validateRegisterForm() {
 
     return true;
 }
-
 function sendLoginRequest() {
     $("#spinner").removeClass("d-none");
 
@@ -93,8 +91,9 @@ function sendLoginRequest() {
         }
     });
 }
-
 function sendregisterRequest() {
+    $("#spinner").removeClass("d-none"); // SHOW spinner
+
     $.ajax({
 
         url: "/Auth/Register",
@@ -104,13 +103,14 @@ function sendregisterRequest() {
             $("#spinner").addClass("d-none");
 
             if (res.success) {
-                window.location.href = "/Auth/Login";
+                window.location.href = "/Auth/ValidateOtp";
             }
             else {
                 alert("something went wrong");
             }
         },
         error: function (xhr) {
+            $("#spinner").addClass("d-none");
             if (xhr.status === 409) {
                 alert(xhr.responseJSON.message); 
             }
@@ -123,3 +123,97 @@ function sendregisterRequest() {
         }
     });
 }
+function sendValidateOtpRequest() {
+    if ($("#Otp").val().trim() === "") {
+        alert("OTP is required");
+        return;
+    }
+
+    $("#spinner").removeClass("d-none");
+
+    $.ajax({
+        url: "/Auth/ValidateOtp",
+        type: "POST",
+        data: $("#MDVerifyOtpForm").serialize(),
+        success: function (res) {
+            $("#spinner").addClass("d-none");
+
+            if (res.success) {
+                window.location.href = "/Auth/ResetPassword";
+            } else {
+                alert(res.message || "Invalid OTP");
+            }
+        },
+        error: function () {
+            $("#spinner").addClass("d-none");
+            alert("Server error");
+        }
+    });
+}
+function sendForgetPasswordRequest() {
+
+    if ($("#Email").val().trim() === "") {
+        alert("Otp is required");
+        $("#Email").focus();
+        return;
+    }
+
+    $("#spinner").removeClass("d-none");
+
+    $.ajax({
+
+        url: "/Auth/ForgotPassword",
+        type: "POST",
+        data: $("#MDForgetPasswordEmailForm").serialize(),
+
+        success: function (res) {
+            $("#spinner").addClass("d-none");
+
+            if (res.success) {
+                window.location.href = "/Auth/ValidateOtp";
+            }
+            else {
+                alert(res.message || "Something went worng");
+            }
+        },
+        error: function () {
+            $("#spinner").addClass("d-none");
+            alert("server error");
+        }
+    });
+}
+function sendResetPasswordRequest() {
+    if ($("#Password").val().trim() === "") {
+        alert("new Password is required");
+        return;
+    }
+    if ($("#ConfirmPassword").val().trim() === "") {
+        alert("Confirm Password is required");
+        return;
+    }
+    if ($("#ConfirmPassword").val().trim() !== $("#Password").val().trim()) {
+        alert("New Password and Confirm Password is not matched");
+        return;
+    }
+
+    $("#spinner").removeClass("d-none");
+
+    $.ajax({
+        url: "/Auth/ResetPassword",
+        type: "POST",
+        data: $("#MDResetPaswordForm").serialize(),
+        success: function (res) {
+            $("#spinner").addClass("d-none");
+            if (res.success) {
+                window.location.href = "/Auth/Login";
+            } else {
+                alert(res.message || "Failed to reset password please try again letter");
+            }
+        },
+        error: function () {
+            $("#spinner").addClass("d-none");
+            alert("Server error");
+        }
+    });
+}
+
